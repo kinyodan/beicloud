@@ -1,0 +1,25 @@
+<div class="content-body ">
+  <%= render @onboarding %>
+  <div class="row container-wrapper">
+    <div class="col-sm">
+      <%= render "onboardings/select_repo" , repos: @repos %>
+    </div>
+    <div class="col-sm branches" >
+          <%= render "onboardings/select_repo" , repos: @repos %>
+    </div>
+        <div class="col-sm">
+          <%= render "onboardings/select_repo" , repos: @repos %>
+    </div>
+        <div class="col-sm">
+          <%= render "onboardings/select_repo" , repos: @repos %>
+    </div>
+  </div>
+</div>
+
+        <%# <div>
+          <%= link_to "Edit this onboarding", edit_onboarding_path(@onboarding) %> 
+          <%# <%= link_to "Back to onboardings", onboardings_path %> 
+
+          <%# <%= button_to "Destroy this onboarding", @onboarding, method: :delete %>
+        <%# </div> %>
+

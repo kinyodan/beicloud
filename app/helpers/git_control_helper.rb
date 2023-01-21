@@ -1,0 +1,2 @@
+module GitControlHelper
+end

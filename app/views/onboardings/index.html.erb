@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Onboardings</h1>
+
+<div id="onboardings">
+  <% @onboardings.each do |onboarding| %>
+    <%= render onboarding %>
+    <p>
+      <%= link_to "Show this onboarding", onboarding %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New onboarding", new_onboarding_path %>

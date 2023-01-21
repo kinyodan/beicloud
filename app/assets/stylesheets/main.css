@@ -1,0 +1,10 @@
+.logo img{
+    height: 60px;
+}
+
+.repo_item{
+    width: auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 20% 80%;
+}
