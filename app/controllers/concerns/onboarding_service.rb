@@ -37,7 +37,7 @@ module OnboardingService
             p system("sudo dokku git:initialize app003-#{dir_name}")
             p system("git remote remove dokku")
             p system("git remote add dokku dokku@dokku.me:app003-#{dir_name}")
-            # p system("git push dokku")
+            p system("git push dokku main")
 
         end 
 end 
