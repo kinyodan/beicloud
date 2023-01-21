@@ -23,7 +23,7 @@ module OnboardingService
             system("rm -rf ../#{dir_name}")
             p system("git clone #{repo} ../#{dir_name}")
             p system("cd #{dir_name}")
-            p system("dir")
+            p system("pwd")
             p system("git add .")
             p system("git commit -m 'commit for deploy to dokku' ")
             # p system("git fetch --all")
