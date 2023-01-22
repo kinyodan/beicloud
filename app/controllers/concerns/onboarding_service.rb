@@ -22,9 +22,9 @@ module OnboardingService
             p repo
             system("rm -rf ../#{dir_name}")
             p system("git clone #{repo} ../#{dir_name}")
-            system("cd /home/me/dev/dev3/beicloud/#{dir_name}")
+            p system("cd /home/me/dev/dev3/beicloud/#{dir_name} && pwd")
             # p system("cd #{dir_name}")
-            p system("pwd")
+            p "system(pwd)"
             p system("git add .")
             p system("git commit -m 'commit for deploy to dokku' ")
             # p system("git fetch --all")
