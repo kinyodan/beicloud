@@ -22,6 +22,7 @@ module OnboardingService
             p repo
             system("rm -rf ../#{dir_name}")
             p system("git clone #{repo} ../#{dir_name}")
+            system("cd ..")
             p system("cd #{dir_name}")
             p system("pwd")
             p system("git add .")
