@@ -8,11 +8,12 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= Gon::Base.render_data %>
   </head>
 
   <body>
-    <%= render "shared/top_nav" %>
-    <%= render "shared/sidebar" %>
+    <%# <%= render "shared/top_nav" %> 
+    <%# <%= render "shared/sidebar" %> 
     <%= yield %>
   </body>
 </html>

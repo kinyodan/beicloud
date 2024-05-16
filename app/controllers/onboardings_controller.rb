@@ -1,5 +1,10 @@
+# frozen_string_literal: true
+
+require 'zlib'
+
 class OnboardingsController < ApplicationController
-  before_action :set_onboarding, only: %i[ show edit update destroy ]
+  include GitControlService
+  before_action :set_onboarding, only: %i[show edit update destroy]
 
   # GET /onboardings or /onboardings.json
   def index
@@ -8,17 +13,15 @@ class OnboardingsController < ApplicationController
 
   # GET /onboardings/1 or /onboardings/1.json
   def show
-    token = "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"
-    owner = "kinyodan"
-    repo = "beimarket-v1"
-    path_to_file = ""
-    retreived_repos = onboardingServiceImportFromGithub(token,owner,repo,path_to_file )
-    if retreived_repos
-      @repos = retreived_repos
-    else
-      @repos = []
-    end 
+    @beiapp = Beiapp.where(id: @onboarding.beiapp_id).first
+    @deployments = Deployment.where(onboarding_id: @onboarding.id)
+    @repos = request.cookies['git_repos_url']? JSON.parse(git_control_fetch_Git_Repos(request.cookies['git_repos_url'])) : []
 
+    @repos_list = []
+    @repos.each do |repo|
+      @repos_list.push(repo['name'])
+    end
+    gon.push(repos: @repos_list)
   end
 
   # GET /onboardings/new
@@ -27,8 +30,7 @@ class OnboardingsController < ApplicationController
   end
 
   # GET /onboardings/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /onboardings or /onboardings.json
   def create
@@ -36,7 +38,7 @@ class OnboardingsController < ApplicationController
 
     respond_to do |format|
       if @onboarding.save
-        format.html { redirect_to onboarding_url(@onboarding), notice: "Onboarding was successfully created." }
+        format.html { redirect_to onboarding_url(@onboarding), notice: 'Onboarding was successfully created.' }
         format.json { render :show, status: :created, location: @onboarding }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -49,7 +51,7 @@ class OnboardingsController < ApplicationController
   def update
     respond_to do |format|
       if @onboarding.update(onboarding_params)
-        format.html { redirect_to onboarding_url(@onboarding), notice: "Onboarding was successfully updated." }
+        format.html { redirect_to onboarding_url(@onboarding), notice: 'Onboarding was successfully updated.' }
         format.json { render :show, status: :ok, location: @onboarding }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -63,19 +65,20 @@ class OnboardingsController < ApplicationController
     @onboarding.destroy
 
     respond_to do |format|
-      format.html { redirect_to onboardings_url, notice: "Onboarding was successfully destroyed." }
+      format.html { redirect_to onboardings_url, notice: 'Onboarding was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_onboarding
-      @onboarding = Onboarding.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def onboarding_params
-      params.require(:onboarding).permit(:user_id, :subdomain, :uuid, :status, :state)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_onboarding
+    @onboarding = Onboarding.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def onboarding_params
+    params.require(:onboarding).permit(:user_id, :subdomain, :uuid, :status, :beiapp_id, :state)
+  end
 end

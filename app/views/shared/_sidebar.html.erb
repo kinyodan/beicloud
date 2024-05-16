@@ -1,13 +1,13 @@
 <aside>
   <p> Menu </p>
-  <a href="javascript:void(0)">
+  <%= link_to beiapps_path do %>
     <i class="fa fa-user-o" aria-hidden="true"></i>
-    My drive
-  </a>
-  <a href="javascript:void(0)">
+    Beiapps
+  <% end %>
+  <%= link_to onboardings_path do %>
     <i class="fa fa-laptop" aria-hidden="true"></i>
-    Computers
-  </a>
+    App Deployemnts
+  <% end %>
   <a href="javascript:void(0)">
     <i class="fa fa-clone" aria-hidden="true"></i>
     Shared with me

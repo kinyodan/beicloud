@@ -1,0 +1,82 @@
+// body{
+//     background: #00589F;
+//     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00589F', endColorstr='#0073CF', GradientType=0);
+//     background: -webkit-linear-gradient(to bottom, #00589F 50%, #0073CF) !important;
+//     background: -moz-linear-gradient(to bottom, #00589F 50%, #0073CF) !important;
+//     background: -ms-linear-gradient(to bottom, #00589F 50%, #0073CF) !important;
+//     background: -o-linear-gradient(to bottom, #00589F 50%, #0073CF) !important;
+//     background: linear-gradient(to bottom, #00589F 50%, #0073CF) !important;
+//     color: white;
+//   }
+  
+  div.well{
+    height: 250px;
+  } 
+  
+  .Absolute-Center {
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+  }
+  
+  .Absolute-Center.is-Responsive {
+    width: 50%;
+    height: 400px;
+    min-width: 200px;
+    max-width: 400px;
+    padding: 20px;
+    // border-style: solid;
+    // border-width: thin;
+    // border-radius: 1.25rem;
+  }
+  
+  #logo-container{
+    margin: auto;
+    margin-bottom: 10px;
+    width:200px;
+    height:30px;
+    background-image:url('http://placehold.it/200x30/000000/ffffff/&text=BRAND+LOGO');
+  }
+
+  
+ .input-group input:focus {
+    background-color: #ececec;
+    border-style: solid;
+    border-color: #d3cfcf;
+    border-width: thin;
+  }
+
+  .Absolute-Center{
+    .btn-block {
+        color: #ffffff;
+        display: block;
+        width: 100%;
+        background: #2da44e;
+    }
+
+    .input-group-addon{
+        padding:5px;
+        border-style: solid;
+        border-color: #cccccc;
+        border-width: thin;
+
+    }  
+
+    #loginForm{
+        border-style: solid;
+        border-color: #cccccc;
+        border-width: thin;
+        padding: 15px;
+        border-radius: 0.5rem;
+        background-color: #f6f8fa;
+    }
+
+    .header-logo{
+        margin-left: 40%;
+        margin-right: 40%;
+    }
+
+    #logo-container h3{
+        text-align: center;
+    }
+  }

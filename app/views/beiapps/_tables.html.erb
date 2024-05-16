@@ -1,0 +1,50 @@
+              <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7"><strong>Deployemnt</th>
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">&nbsp;<strong><i class="fa-solid fa-clock"></i> started at</strong></th>
+                      <th class="text-center text-uppercase text-secondary text-sm font-weight-bolder opacity-7">&nbsp;</th>
+                      <th class="text-center text-uppercase text-secondary text-sm font-weight-bolder opacity-7">&nbsp;<i class="fa-solid fa-clock"></i> finished at</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                   <% deployments.each do |deployment|%>
+                     <tr>
+                        <td>
+                            <div class="d-flex px-2 py-1">
+                            <div>
+                                <img src="https://res.cloudinary.com/selae-learning/image/upload/v1675190170/beicloud-assets/file-upload_vuxim2.png" class="avatar avatar-sm me-3" alt="user1">
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"><%= deployment.name %></h6>
+                                <p class="text-xs text-secondary mb-0"><%= deployment.created_at %></p>
+                            </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-secondary text-xs font-weight-bold"><%= deployment.created_at %></span>
+                        </td>
+                        <td class="align-middle text-center text-sm">
+                            <% if deployment.status.include? "succesfully"%>
+                               <span class="badge badge-sm bg-gradient-success">Sucess deploy</span>
+                            <% else%>
+                               <span class="badge badge-sm bg-gradient-danger">Failed</span>
+                            <% end %>
+
+                        </td>
+                        <td class="align-middle text-center">
+                            <span class="text-secondary text-xs font-weight-bold"><%= deployment.updated_at %></span>
+                        </td>
+                        <td class="align-middle">
+                            <%# <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                            Edit
+                            </a> %>
+                        </td>
+                      </tr>
+                    <% end %> 
+
+                  </tbody>
+                </table>
+              </div>

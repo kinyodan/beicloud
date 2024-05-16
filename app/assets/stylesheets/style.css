@@ -311,6 +311,10 @@ button {
      line-height: 40px;
 }
 
+.logo img{
+     height: 50px;
+ }
+
 .banner_main {
      background: #0c0f38;
      background-size: 100% 100%;

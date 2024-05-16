@@ -47,8 +47,8 @@
                   <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col logo_section">
                      <div class="full">
                         <div class="center-desk">
-                           <div class="logo">
-                              <a href="index.html"><img src="https://res.cloudinary.com/selae-learning/image/upload/v1674263999/beimarket-assets/beicloud-white_xrsyza.jpg" alt="#" /></a>
+                           <div class="logo landing_logo_section">
+                              <a href="/"><img src="https://res.cloudinary.com/selae-learning/image/upload/v1674263999/beimarket-assets/beicloud-white_xrsyza.jpg" alt="#" /></a>
                            </div>
                         </div>
                      </div>
@@ -64,7 +64,7 @@
                                  <a class="nav-link" href="#">Home</a>
                               </li>
                               <li class="nav-item">
-                                 <a class="nav-link" href="#"> About  </a>
+                                 <%= link_to "Beiapps",beiapps_path, class:"nav-link" %> 
                               </li>
                               <li class="nav-item">
                                  <a class="nav-link" href="#service"> Service</a>
@@ -73,7 +73,11 @@
                                  <a class="nav-link" href="#contact">Contact</a>
                               </li>
                               <li class="nav-item">
-                                 <a class="nav-link" href="#">Sign Up</a>
+                                 <% if @beispace_current_user %>
+                                   <a class="nav-link" href="<%= logout_path %>">Logout</a>
+                                 <% else %>
+                                    <a class="nav-link" href="<%= login_path %>">Login</a>
+                                 <% end %>
                               </li>
                            </ul>
                         </div>

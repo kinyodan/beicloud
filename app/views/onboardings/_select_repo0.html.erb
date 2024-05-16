@@ -1,0 +1,33 @@
+<h3>Select repository to deploy</h3>
+<div class="drop-select-container zoomIn">
+<label class="custom-select">
+    <select onchange="populatesBranches()" id="repo-select">
+        <option disabled selected>Select repository to deploy</option>
+        <% @repos.each do |repo| %>
+          <option data-id="<%= repo['id'] %>" data-branch="<%= repo['clone_url'] %>" class="repo-options" value=" <%= {id: repo['id'], branch: repo['clone_url'] }.to_json %>" data-icon="<i class='fa fa-address-book-o' aria-hidden='true'></i>">
+            <i class="fa-brands fa-github"></i> <%= repo["name"] %>
+          </option>
+        <% end %>
+    </select>
+</label>
+</div>
+
+<script>
+function populatesBranches(){
+  console.log(event)
+  let repoSelect = document.getElementById("repo-select")
+  let selectValue= JSON.parse(repoSelect.value)
+  let branch = selectValue.branch
+  let branch_id = selectValue.id
+  let deployButton = document.querySelector(".button-77")
+  let deployemntInProgress = deployButton.dataset.deployemntinprogress
+
+  if (branch_id !== "default" && deployemntInProgress === "false"){
+      deployButton.disabled = false
+      console.log(deployemntInProgress)
+  }
+  deployButton.setAttribute("data-id", branch_id);  
+  deployButton.setAttribute("data-branch", branch);  
+}
+
+</script>

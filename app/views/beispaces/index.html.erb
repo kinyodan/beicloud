@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Beispaces</h1>
+
+<div id="beispaces">
+  <% @beispaces.each do |beispace| %>
+    <%= render beispace %>
+    <p>
+      <%= link_to "Show this beispace", beispace %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New beispace", new_beispace_path %>

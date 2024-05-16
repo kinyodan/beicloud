@@ -1,0 +1,272 @@
+<div class="content-body ">
+  <div class="row container-wrapper">
+    <div class="col-sm display-card-lsts">
+
+          <div class="plx-card silver">
+              <div class="pxc-bg" style=""> </div>
+              <div class="pxc-avatar">
+              <span class="pxc-icon-o1">
+                <i class="fa-solid fa-layer-group fa-2x"></i>
+              </span>
+              <%# <img src="https://store./image?w=240&amp;h=240&amp;bg_color=000000&amp;opacity=100&amp;_version=00_09_000" /> %>
+              </div>
+              <div class="pxc-stopper"> </div>
+              <div class="pxc-subcard">
+                  <div class="pxc-title"><%= @beiapp.name%> </div>
+                  <div class="pxc-sub"> <%= @beiapp.summary %> 
+                      <% if request.cookies["git_repos_url"]%>
+                            <%= link_to "Deploy your app", onboarding_path(@beiapp_onboarding) , data: {turbo: false}%>
+                      <% else %>
+                            <%= button_to "Deploy your app" , user_github_omniauth_authorize_path, data: { turbo_method: :post }, html:{ class:"btn btn-success" } %>
+                      <% end %>
+                  </div>
+                  <div class="pxc-feats"><span>Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat </span></div>
+                  <div class="pxc-tags">
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat TwoFeat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                  </div>
+                  <div class="bottom-row">
+                      <div class="pxc-info">
+                          <div class="flags">
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.application_stack.to_sym] %>" /></span>
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.code_stack.to_sym] %>"/></span>
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.primary_dependency_stack.to_sym] %>" /></span>
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.database_stack.to_sym] %>"  /></span>
+                          </div>
+                          <div class="region">Global</div>
+                      </div>
+                      <div class="links">
+                      <%# <a class="site" uk-tooltip="WEBSITE"><i class="fas fa-globe-americas"> </i></a><a class="link discordLink" uk-tooltip="DISCORD SERVER"><i class="fab fa-discord"></i></a><a class="shop" uk-tooltip="EXCLUSIVE POLLUX SHOP"><i class="fas fa-shopping-bag"> </i></a> %>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="plx-card gold">
+              <div class="pxc-bg" style=""> </div>
+              <%# <div class="pxc-bg" style="background-image:url('https://i.gyazo.com/a846fc87cca5ebd3942ae1e038bb5083.png')"> </div> %>
+              <div class="pxc-avatar">
+              <span class="pxc-icon-o1">
+                <i class="fa-solid fa-address-card fa-2x"></i>
+              </span>
+              <%# <img src="https://res.cloudinary.com/selae-learning/image/upload/v1674657428/beimarket-assets/tim-van-der-kuip-HVp2MG15y3E-unsplash_phrrmx_8c6dc82.jpg" /> %>
+              </div>
+              <div class="pxc-stopper"> </div>
+              <div class="pxc-subcard">
+                  <div class="pxc-title">  </div>
+                  <div class="pxc-sub"> <i class="fa-solid fa-user-gear"></i> <%= @beiapp.owner_name %> </div>
+                  <div class="pxc-sub"> <i class="fa-solid fa-square-phone-flip"></i>  <%= @beiapp.owner_contact_phone %></div>
+                  <div class="pxc-sub"> <i class="fa-solid fa-at"></i> <%= @beiapp.owner_contact_email %> </div>
+                  <div class="pxc-sub"> <i class="fa-solid fa-location-dot"></i> <%= @beiapp.owner_location %> </div>
+                  <div class="pxc-sub"> <i class="fa-solid fa-link"></i> <%= @beiapp.owner_website %> </div>
+
+                  <div class="pxc-feats">
+                  </div>
+                  <div class="pxc-tags">
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat TwoFeat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                  </div>
+                  <div class="bottom-row">
+                      <div class="pxc-info">
+
+                      </div>
+                      <div class="links">
+                        <a class="site" href="<%= @beiapp.owner_social_twitter %>" uk-tooltip="WEBSITE"><i class="fa-brands fa-twitter"></i> </a>
+                        <a class="link discordLink" href="<%= @beiapp.owner_social_github %>" uk-tooltip="DISCORD SERVER"><i class="fa-brands fa-github"></i></a>
+                        <a class="shop" href="<%= @beiapp.owner_social_instagram %>" uk-tooltip="EXCLUSIVE POLLUX SHOP"><i class="fa-brands fa-instagram"></i> </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+         <div class="plx-card silver">
+              <%# <div class="pxc-bg" style="background-image:url('https://i.gyazo.com/a846fc87cca5ebd3942ae1e038bb5083.png')"> </div> %>
+              <div class="pxc-bg" style=""> </div>
+              <div class="pxc-avatar">
+              <span class="pxc-icon-o1">
+                <i class="fa-brands fa-square-github fa-2x"></i>
+              </span>
+              <%# <img src="https://store./image?w=240&amp;h=240&amp;bg_color=000000&amp;opacity=100&amp;_version=00_09_000" /> %>
+              </div>
+              <div class="pxc-stopper"> </div>
+              <div class="pxc-subcard">
+                  <div class="pxc-sub"> <i class="fa-brands fa-github"></i> Thiss probably should be called tagline instead </div>
+                  <div class="pxc-sub"> <i class="fa-solid fa-user-secret fa-lg"></i> Thiss probably should be called tagline instead </div>
+                  <div class="pxc-sub"> Thiss probably should be called tagline instead </div>
+
+                  <div class="pxc-feats">
+                    <span>Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat </span>
+                  </div>
+                  <div class="pxc-tags">
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat TwoFeat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                  </div>
+                  <div class="bottom-row">
+                      <div class="pxc-info">
+                          <div class="flags">
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.application_stack.to_sym] %>" /></span>
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.code_stack.to_sym] %>"/></span>
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.primary_dependency_stack.to_sym] %>" /></span>
+                            <span><img src="<%= applicationHelperGetStackIcons[@beiapp.database_stack.to_sym] %>"  /></span>
+                          </div>
+                          <div class="region">Global</div>
+                      </div>
+                      <div class="links"><a class="site" uk-tooltip="WEBSITE"><i class="fas fa-globe-americas"> </i></a><a class="link discordLink" uk-tooltip="DISCORD SERVER"><i class="fab fa-discord"></i></a><a class="shop" uk-tooltip="EXCLUSIVE POLLUX SHOP"><i class="fas fa-shopping-bag"> </i></a></div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="plx-card bronze">
+              <div class="pxc-bg" style="background-image:url('https://i.gyazo.com/a846fc87cca5ebd3942ae1e038bb5083.png')"> </div>
+              <div class="pxc-avatar">
+                 <%# <span class="pxc-icon">
+                    <span class="pxc-icon-o1">
+                     <i class="fa-solid fa-cloud fa-2x"></i>
+                    </span>
+                 </span> %>
+              <img src="https://store.playstation.com/store/api/chihiro/00_09_000/container/GB/en/999/EP4312-CUSA07658_00-AV00000000000049/1536930670000/image?w=240&amp;h=240&amp;bg_color=000000&amp;opacity=100&amp;_version=00_09_000" />
+              </div>
+              <div class="pxc-stopper"> </div>
+              <div class="pxc-subcard">
+                  <div class="pxc-title">
+                  <%# <%=  render "onboardings/select_repo" ,repos: @repos %> 
+
+                  </div>
+                  <div class="pxc-sub"> 
+                    <%= button_to "sign in with github" , user_github_omniauth_authorize_path, data: { turbo_method: :post } %>Thiss probably should be called tagline instead 
+                    <%# <%= link_to "sign in with github" , user_github_omniauth_authorize_path, data: { turbo_method: :post } %> 
+                   </div>
+                  <div class="pxc-feats"><span>Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat </span></div>
+                  <div class="pxc-tags">
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat TwoFeat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                  </div>
+                  <div class="bottom-row">
+                      <div class="pxc-info">
+                          <div class="flags">
+                            <span><img src="http://pollux.fun/images/flags/EN.png" /> </span>
+                            <span><img src="http://pollux.fun/images/flags/BR.png" /></span>
+                            <span><img src="http://pollux.fun/images/flags/FR.png" /></span>
+                            <span><img src="http://pollux.fun/images/flags/TR.png" /></span>
+                            <span><img src="http://pollux.fun/images/flags/JP.png" /></span>
+                          </div>
+                          <div class="region">
+                           <%= @github_link %>
+                           <%= link_to "sign in with github" , @github_link %> Glo999bal
+                          </div>
+                      </div>
+                      <div class="links"><a class="site" uk-tooltip="WEBSITE"><i class="fas fa-globe-americas"> </i></a><a class="link discordLink" uk-tooltip="DISCORD SERVER"><i class="fab fa-discord"></i></a><a class="shop" uk-tooltip="EXCLUSIVE POLLUX SHOP"><i class="fas fa-shopping-bag"> </i></a></div>
+                  </div>
+              </div>
+          </div>
+
+
+
+ 
+
+          <%# <div class="plx-card bronze">
+              <div class="pxc-bg" style="background-image:url('https://i.gyazo.com/a846fc87cca5ebd3942ae1e038bb5083.png')"> </div>
+              <div class="pxc-avatar"><img src="https://store.playstation.com/store/api/chihiro/00_09_000/container/GB/en/999/EP4312-CUSA07658_00-AV00000000000049/1536930670000/image?w=240&amp;h=240&amp;bg_color=000000&amp;opacity=100&amp;_version=00_09_000" /></div>
+              <div class="pxc-stopper"> </div>
+              <div class="pxc-subcard">
+                  <div class="pxc-title">Super Awesome Long-named Serverrrrrrr</div>
+                  <div class="pxc-sub"> Thiss probably should be called tagline instead </div>
+                  <div class="pxc-feats"><span>Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat </span></div>
+                  <div class="pxc-tags">
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat TwoFeat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                  </div>
+                  <div class="bottom-row">
+                      <div class="pxc-info">
+                          <div class="flags"><span><img src="http://pollux.fun/images/flags/EN.png" /></span><span><img src="http://pollux.fun/images/flags/BR.png" /></span><span><img src="http://pollux.fun/images/flags/FR.png" /></span><span><img src="http://pollux.fun/images/flags/TR.png" /></span><span><img src="http://pollux.fun/images/flags/JP.png" /></span></div>
+                          <div class="region">Global</div>
+                      </div>
+                      <div class="links"><a class="site" uk-tooltip="WEBSITE"><i class="fas fa-globe-americas"> </i></a><a class="link discordLink" uk-tooltip="DISCORD SERVER"><i class="fab fa-discord"></i></a><a class="shop" uk-tooltip="EXCLUSIVE POLLUX SHOP"><i class="fas fa-shopping-bag"> </i></a></div>
+                  </div>
+              </div>
+          </div> %>
+
+
+
+
+
+
+
+
+          <%# <div class="plx-card bronze">
+              <div class="pxc-bg" style="background-image:url('https://i.gyazo.com/a846fc87cca5ebd3942ae1e038bb5083.png')"> </div>
+              <div class="pxc-avatar"><img src="https://store.playstation.com/store/api/chihiro/00_09_000/container/GB/en/999/EP4312-CUSA07658_00-AV00000000000049/1536930670000/image?w=240&amp;h=240&amp;bg_color=000000&amp;opacity=100&amp;_version=00_09_000" /></div>
+              <div class="pxc-stopper"> </div>
+              <div class="pxc-subcard">
+                  <div class="pxc-title">Super Awesome Long-named Serverrrrrrr</div>
+                  <div class="pxc-sub"> Thiss probably should be called tagline instead </div>
+                  <div class="pxc-feats"><span>Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat Feat One</span><span> Feat Two</span><span> Feat One Hundred and Seventy Three</span><span> Feat Forty Five</span><span>Feat </span></div>
+                  <div class="pxc-tags">
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat TwoFeat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                      <div>Feat Two</div>
+                  </div>
+                  <div class="bottom-row">
+                      <div class="pxc-info">
+                          <div class="flags"><span><img src="http://pollux.fun/images/flags/EN.png" /></span><span><img src="http://pollux.fun/images/flags/BR.png" /></span><span><img src="http://pollux.fun/images/flags/FR.png" /></span><span><img src="http://pollux.fun/images/flags/TR.png" /></span><span><img src="http://pollux.fun/images/flags/JP.png" /></span></div>
+                          <div class="region">Global</div>
+                      </div>
+                      <div class="links"><a class="site" uk-tooltip="WEBSITE"><i class="fas fa-globe-americas"> </i></a><a class="link discordLink" uk-tooltip="DISCORD SERVER"><i class="fab fa-discord"></i></a><a class="shop" uk-tooltip="EXCLUSIVE POLLUX SHOP"><i class="fas fa-shopping-bag"> </i></a></div>
+                  </div>
+              </div>
+          </div> %>
+
+        <div>
+          <%= link_to "Edit this beiapp", edit_beiapp_path(@beiapp) %> |
+          <%= link_to "Back to beiapps", beiapps_path %>
+          <%= button_to "Destroy this beiapp", @beiapp, method: :delete %>
+        </div>
+
+    </div>
+  </div>
+</div>
+<script>
+ let sdc = "<%= @beiapp %>"
+ console.log(sdc)
+</script>

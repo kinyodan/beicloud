@@ -1,0 +1,132 @@
+.custom-select 
+{
+    display: inline-block;
+    position: relative;
+    top: 30%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    border-radius: 5px;
+    /* Styling the select background */
+    height: calc(2.25rem + 14px);
+
+    select 
+    {
+        width: 100%;
+        margin: 0;
+        padding: .75em 1.5em;
+        outline: none;
+        cursor: pointer;
+        border: none;
+        border-radius: 0;
+        background-color: transparent;
+        /* Styling the select text color */
+        color: darken(#1FBDED,35%);
+
+        /* removes the fucking native down arrow */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        text-indent: 0.01px;
+        text-overflow: '';
+    
+        &::-ms-expand 
+        {
+            display: none;
+        }
+    
+    }
+}
+
+
+.drop-select-container{
+    padding:20px;
+    // width: 70%;
+    .custom-select 
+    {
+        display: inline-block;
+        position: relative;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        border-radius: 5px;
+        /* Styling the select background */
+        height: calc(2.25rem + 14px);
+
+        select 
+        {
+            width: 100%;
+            margin: 0;
+            padding: .75em 1.5em;
+            outline: none;
+            cursor: pointer;
+            border: none;
+            border-radius: 0;
+            background-color: transparent;
+            /* Styling the select text color */
+            color: darken(#1FBDED,35%);
+
+            /* removes the fucking native down arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            text-indent: 0.01px;
+            text-overflow: '';
+        
+            &::-ms-expand 
+            {
+                display: none;
+            }
+        
+        }
+
+        &:before,
+        &:after
+        {
+            position: absolute;
+            top: 50%;
+            right: 1em;
+            width: 0;
+            height: 0;
+            padding: 0;
+            content: '';
+            pointer-events: none;
+        }
+
+        &:before 
+        {
+            transform: translateY(-125%);
+            /* Styling the down arrow */
+            border-left: .25em solid transparent;
+            border-right: .25em solid transparent;
+            border-bottom: .375em solid darken(#1FBDED,25%);
+        }
+
+        &:after 
+        {
+            /* Styling the down arrow */
+            border-left: .25em solid transparent;
+            border-right: .25em solid transparent;
+            border-top: .375em solid darken(#1FBDED,25%);
+        }
+
+        option{
+            padding: 10px;
+        }
+    }
+
+    @-moz-document url-prefix()
+    { 
+        .custom-select select 
+        {
+            padding-right: 1.75em;    
+        }
+    }
+
+    @media screen and (-webkit-min-device-pixel-ratio:0) { 
+        .custom-select select 
+        {
+            padding-right: 2em;    
+        }
+    }
+
+}

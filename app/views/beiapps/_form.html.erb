@@ -1,0 +1,102 @@
+<%= form_with(model: beiapp) do |form| %>
+  <% if beiapp.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(beiapp.errors.count, "error") %> prohibited this beiapp from being saved:</h2>
+
+      <ul>
+        <% beiapp.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :beispace_id, style: "display: block" %>
+    <%= form.number_field :beispace_id %>
+  </div>
+
+  <div>
+    <%= form.label :application_stack, style: "display: block" %>
+    <%= form.text_field :application_stack %>
+  </div>
+
+  <div>
+    <%= form.label :code_stack, style: "display: block" %>
+    <%= form.text_field :code_stack %>
+  </div>
+
+  <div>
+    <%= form.label :code_stack_version, style: "display: block" %>
+    <%= form.text_field :code_stack_version %>
+  </div>
+
+  <div>
+    <%= form.label :primary_dependency_stack, style: "display: block" %>
+    <%= form.text_field :primary_dependency_stack %>
+  </div>
+
+  <div>
+    <%= form.label :database_stack, style: "display: block" %>
+    <%= form.text_field :database_stack %>
+  </div>
+
+  <div>
+    <%= form.label :database_version, style: "display: block" %>
+    <%= form.text_field :database_version %>
+  </div>
+
+  <div>
+    <%= form.label :summary, style: "display: block" %>
+    <%= form.text_field :summary %>
+  </div>
+
+  <div>
+    <%= form.label :owner_name, style: "display: block" %>
+    <%= form.text_field :owner_name %>
+  </div>
+
+  <div>
+    <%= form.label :owner_contact_phone, style: "display: block" %>
+    <%= form.text_field :owner_contact_phone %>
+  </div>
+
+  <div>
+    <%= form.label :owner_location, style: "display: block" %>
+    <%= form.text_field :owner_location %>
+  </div>
+
+  <div>
+    <%= form.label :owner_website, style: "display: block" %>
+    <%= form.text_field :owner_website %>
+  </div>
+
+  <div>
+    <%= form.label :owner_contact_email, style: "display: block" %>
+    <%= form.text_field :owner_contact_email %>
+  </div>
+
+  <div>
+    <%= form.label :owner_social_twitter, style: "display: block" %>
+    <%= form.text_field :owner_social_twitter %>
+  </div>
+
+  <div>
+    <%= form.label :owner_social_github, style: "display: block" %>
+    <%= form.text_field :owner_social_github %>
+  </div>
+
+  <div>
+    <%= form.label :owner_social_instagram, style: "display: block" %>
+    <%= form.text_field :owner_social_instagram %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

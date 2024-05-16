@@ -1,25 +1,157 @@
-<div class="content-body ">
-  <%= render @onboarding %>
-  <div class="row container-wrapper">
-    <div class="col-sm">
-      <%= render "onboardings/select_repo" , repos: @repos %>
-    </div>
-    <div class="col-sm branches" >
-          <%= render "onboardings/select_repo" , repos: @repos %>
-    </div>
-        <div class="col-sm">
-          <%= render "onboardings/select_repo" , repos: @repos %>
-    </div>
-        <div class="col-sm">
-          <%= render "onboardings/select_repo" , repos: @repos %>
-    </div>
-  </div>
-</div>
+  <div class="content-body ">
+    <div class="row ">
+      <div class="col-sm display-card-lsts">
+	    <div class="inner-header">
+	  	   <h3><img src="https://res.cloudinary.com/selae-learning/image/upload/v1675200705/beicloud-assets/cloud-coding_q54v3l.png"/> Beiapp Deployment for { <%= @beiapp.name %> }</h3>
+		</div>		
 
-        <%# <div>
-          <%= link_to "Edit this onboarding", edit_onboarding_path(@onboarding) %> 
-          <%# <%= link_to "Back to onboardings", onboardings_path %> 
+        <div class="row container-wrapper">
+          <div class="col-sm">
+            <%= render "onboardings/select_repo0" , repos: @repos_list %>
+            <button class="button-77" data-deployemntinprogress="false" disabled onclick="deployBranch()" role="button">Deploy Repository</button>
+          </div>
 
-          <%# <%= button_to "Destroy this onboarding", @onboarding, method: :delete %>
-        <%# </div> %>
+          <div class="col-sm">
+            <%= render "onboardings/deploy_branch" , repos: @repos %>
+          </div>
+        </div>
+      </div> 
+
+    </div>
+
+	<section class="ftco-section">
+		<div class="container">
+			<div class="row justify-content-center">
+				<%# <div class="col-md-6 text-center mb-5">
+				</div> %>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="table-wrap">
+						<table class="table table-responsive-xl">
+						  <thead>
+						    <tr>
+						    	<th>Deployments for <%= @beiapp.name %></th>
+						      <th></th>
+						      <th></th>
+						      <th>&nbsp;</th>
+						    </tr>
+						  </thead>
+						  <tbody>
+						  <% @deployments.each do |deployment|%>
+						    <tr class="alert" role="alert">
+						        <td class="d-flex align-items-center deployment-list-item">
+									<img src="https://res.cloudinary.com/selae-learning/image/upload/v1675190170/beicloud-assets/file-upload_vuxim2.png"/>
+									<div class="pl-3 email">
+										<span><%= deployment.name %> { <%= deployment.uuid %> }</span>
+										<span></span>
+									</div>
+						        </td>
+						        <td><%= deployment.created_at %></td>
+						        <td class="status">
+								    <span class="active"> 
+								    	<span class="<%= applicationHelpersetClass(deployment.status) %>">
+								   		  <i class="fa-solid fa-circle-info fa-lg"></i> <%= deployment.status%>
+										</span>
+									</span>
+								</td>
+						        <td></td>
+						    </tr>
+							<% end %>
+						  </tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+  </div>  
+<script>
+function deployBranch(){
+  let branch = event.target.dataset.branch
+  let branch_id = event.target.dataset.id
+  let deployButton = document.querySelector(".button-77")
+  let dployemntInProgress = event.target.dataset.deployemntinprogress
+  const loadingContentItem = document.querySelector("#progress-loading-p");
+  let terminalWrapper = document.querySelector(".terminal-wrapper")
+  console.log("deployBranch")
+  console.log(branch)
+  console.log("dployemntInProgress")
+  console.log(dployemntInProgress)
+
+  if(branch !== undefined && dployemntInProgress === "false"){
+    event.preventDefault()
+    deployButton.disabled = true
+    terminalWrapper.classList.add("show-terminal")
+    deployButton.setAttribute("data-deployemntinprogress", true)
+    pushToTerminal(branch_id)
+    const url = "<%= clone_repo_path %>"
+    let params = {repo_url: branch, id: branch_id ,onboarding_id: "<%= @onboarding.id %>", beiapp_id: "<%= @beiapp.id %>"}
+    let postData = JSON.stringify(params)
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: params,
+        success: function(){
+          deployButton.disabled = false
+        },
+    });
+  }
+
+ }
+
+// DEPLOY TERMAINAL CONTROLS 
+const windowContent = document.querySelector(".window-content");
+const loadingContent = document.querySelector("#progress-loading-p");
+const loadingGear = document.querySelector(".fa-spin");
+
+function pushToTerminal(branch_id){
+  loadingContent.innerHTML = "<i class='fa-solid fa-magnet fa-beat'></i></i>"
+  App.cable.subscriptions.create({ channel: "TerminalChannel", id: branch_id }, {
+    connected() {
+      console.log("Connected to the channel:", this);
+    },
+    disconnected() {
+      console.log("Disconnected");
+    },
+    received(data) {
+      console.log("Received some data:", data);
+      initCommand(data)
+    }
+  });
+}
+
+
+console.log("getLastLine----getLastLine")
+function getLastLine () {
+  const lines = document.querySelectorAll(".line");
+  return lines[lines.length - 1]
+}
+
+function createContent(value) {
+  const line = document.createElement("p");
+  line.classList.add("line");
+  line.innerHTML = "<i class='fa-solid fa-gear'></i> <i class='fa-solid fa-mug-hot'></i> " + value;
+  return line;
+}
+
+function render(value) {
+  const content = createContent(value.body);
+  windowContent.insertBefore(content,loadingContent);
+  if(value.status === "finished"){
+    // loadingContent.innerHTML="<i class='fa-solid fa-clipboard-check'></i>......Deployment complete <i class='fa-solid fa-square-check'></i> </br>  " 
+    deployButton.setAttribute("data-deployemntinprogress", false)
+  }
+  const topPos = content.offsetTop;
+  windowContent.scrollTop = topPos;
+}
+
+function initCommand(data) {
+  render(data);
+}
+
+
+</script>
 

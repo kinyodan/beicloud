@@ -1,5 +1,5 @@
-.logo img{
-    height: 60px;
+.landing_logo_section a img{
+    height: 50px;  
 }
 
 .repo_item{
@@ -7,4 +7,12 @@
     padding: 10px;
     display: grid;
     grid-template-columns: 20% 80%;
+}
+
+.sucess-deploy{
+    color: green;
+}
+
+.danger-deploy{
+    color: red;
 }

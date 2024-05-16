@@ -1,4 +1,5 @@
 <%# <h1 class="animated fadeInDown"><i class="icon icon-arrow-down"></i></h1> %>
+ <h3> Select Deployemnt branch</h3>
 
 <div class="select animated zoomIn">
     <!-- You can toggle select (disabled) -->
@@ -7,8 +8,8 @@
     <i class="toggle icon icon-arrow-up"></i>
     <span class="placeholder">Choose...</span>
     <label class="option">
-        <input type="radio" name="option">
-        <span class="title animated fadeIn"><i class="icon icon-speedometer"></i>Choose a Github Repository.....</span>
+        <input type="radio" name="option" class="ui-widget">
+        <span class="title animated fadeIn" data-branch="default"><i class="icon icon-speedometer"></i>Choose a Github Repository.....</span>
     </label>
     <% @repos.each do |repo| %>
         <label class="option">
@@ -19,22 +20,20 @@
 </div>
 <script src="https://res.cloudinary.com/selae-learning/raw/upload/v1674270163/beicloud-assets/jquery.min_qqptdx.js"></script>
 <script>
+
 function populatesBranches(){
-  console.log(event.target.dataset)
   let branch = event.target.dataset.branch
   let branch_id = event.target.dataset.id
+  let deployButton = document.querySelector(".button-77")
+  let deployemntInProgress = deployButton.dataset.deployemntinprogress
 
-    event.preventDefault()
-    const url = "<%= clone_repo_path %>"
-    let params = {repo_url: branch, id: branch_id }
-    let postData = JSON.stringify(params)
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: params,
-        success: "success",
-    });
+  if (branch_id !== "default" && deployemntInProgress === "false"){
+      deployButton.disabled = false
+      console.log(deployemntInProgress)
+  }
+  deployButton.setAttribute("data-id", branch_id);  
+  deployButton.setAttribute("data-branch", branch);  
+}
 
- }
 
 </script>

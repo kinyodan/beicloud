@@ -1,0 +1,39 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  beispace_id: 1
+  application_stack: MyString
+  code_stack: MyString
+  code_stack_version: MyString
+  primary_dependency_stack: MyString
+  database_stack: MyString
+  database_version: MyString
+  summary: MyString
+  owner_name: MyString
+  owner_contact_phone: MyString
+  owner_location: MyString
+  owner_website: MyString
+  owner_contact_email: MyString
+  owner_social_twitter: MyString
+  owner_social_github: MyString
+  owner_social_instagram: MyString
+
+two:
+  name: MyString
+  beispace_id: 1
+  application_stack: MyString
+  code_stack: MyString
+  code_stack_version: MyString
+  primary_dependency_stack: MyString
+  database_stack: MyString
+  database_version: MyString
+  summary: MyString
+  owner_name: MyString
+  owner_contact_phone: MyString
+  owner_location: MyString
+  owner_website: MyString
+  owner_contact_email: MyString
+  owner_social_twitter: MyString
+  owner_social_github: MyString
+  owner_social_instagram: MyString
