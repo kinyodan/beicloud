@@ -15,7 +15,7 @@ Devise.setup do |config|
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
   config.secret_key = 'b8bf1f2108a4c179d3d2196da50799a956a9ab511a17f20f9bf7f10ae053158dfd0d1f5209ad1deb5ea72562a78f4b8d011e173bb90b50cd7ff191b1454ab67b'
-  config.omniauth :github, '145234351daf9164059c', '37bbd9139b269fa2d45ed63f45cdd2f299ed9952', scope: 'user:email'
+  config.omniauth :github, '', '', scope: 'user:email'
   OmniAuth.config.logger = Rails.logger if Rails.env.development?
 
   # ==> Controller configuration
