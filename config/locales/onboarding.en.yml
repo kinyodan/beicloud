@@ -1,0 +1,3 @@
+en:
+  onboarding:
+    output_001: "sudo dokku postgres:create"
