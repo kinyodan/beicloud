@@ -3,78 +3,88 @@
 require 'cgi'
 require 'net/http'
 require 'zlib'
+require 'jwt'  
 
 class ApplicationController < ActionController::Base
   include ServicesManager
-  before_action :set_beispace_cookies
+  include Pagy::Backend  
+
+  helper Pagy::Frontend
+
   before_action :verify_authentication
+  before_action :set_beispace_cookies
   before_action :set_beispace
   before_action :deployment_logs
 
   layout :layout_by_resource
 
-  add_breadcrumb 'home', :root_path
-  add_breadcrumb 'beiapps', :beiapps_path
+  add_breadcrumb 'Home', :root_path
+  add_breadcrumb 'BeiApps', :beiapps_path
 
   def set_stack_icons
-    #  @stack_icons = {javscript: "<i class='fa-brands fa-square-js'></i>", nodejs: }
+    # TODO: Implement proper stack icon mapping
+    # @stack_icons = {
+    #   javascript: "<i class='fa-brands fa-square-js'></i>",
+    #   nodejs: "<i class='fa-brands fa-node-js'></i>",
+    # }
   end
 
+  private
+
   def deployment_logs
+    # TODO: Replace hardcoded strings with real log fetching logic
     @staging_deployment_logs = 'start-logs'
     @deployment_logs = 'start-logs'
   end
 
   def set_beispace_cookies
-    return unless params[:beispace]
+    return unless params[:beispace].present?
 
-    p 'Beispace cookie set' if authentication_set_Beispace_cookies(params[:beispace])
+    if authentication_set_Beispace_cookies(params[:beispace])
+      Rails.logger.debug { "Beispace cookie set for: #{params[:beispace]}" }
+    end
   end
 
   def verify_authentication
-    url_encoded_string = CGI.escape(request.url)
-    uri = URI.parse(request.url)
+    # Early return if already authenticated via cookie
+    if current_beispace_user.present?
+      redirect_to request.path if params[:s].present? 
+      return
+    end
 
-    if request.cookies['beispace_current_user'] && request.cookies['beispace_current_user']['token']
-      sessionid_cookie_set = request.cookies['beispace_current_user']
-      @beispace_current_user = request.cookies['beispace_current_user']
-      redirect_to uri.path if params[:s]
-    else
-      AuthenticationDataProcessor.new(params).authentication_redirector
+    # Handle unauthenticated
+    AuthenticationDataProcessor.new(params).authentication_redirector
+  end
 
+  def set_beispace
+    @beispace = cookies['beispace']
+
+    # to enforce beispace presence
+    redirect_to root_path unless @beispace.present?
+  end
+
+  # JWT Helpers – moved to private as they're utility methods
+  def encode_token(payload, secret, algorithm = 'HS256')
+    JWT.encode(payload, secret, algorithm)
+  end
+
+  def decode_token(token, secret, algorithm = 'HS256')
+    JWT.decode(token, secret, true, algorithm: algorithm).first.deep_symbolize_keys
+  rescue JWT::DecodeError, StandardError
+    {}  
+  end
+
+  # Helper to access current user from cookie
+  def current_beispace_user
+    @beispace_current_user ||= begin
+      cookie_data = request.cookies['beispace_current_user']
+      cookie_data.present? ? cookie_data : nil
     end
   end
 
   protected
 
   def layout_by_resource
-    if devise_controller?
-      'devise'
-    else
-      'application'
-    end
-  end
-
-  private
-
-  def set_beispace
-    if cookies['beispace']
-      @beispace = cookies['beispace']
-    else
-      #    redirect_to root_url
-    end
-  end
-
-  def encrypt(payload, salt, algo = 'HS256')
-    JWT.encode payload, salt, algo
-  end
-
-  def decrypt(token, salt, algo = 'HS256')
-    decrypted_token = JWT.decode token, salt, algo
-    begin
-      decrypted_token.first.deep_symbolize_keys
-    rescue StandardError
-      {}
-    end
+    devise_controller? ? 'devise' : 'application'
   end
 end

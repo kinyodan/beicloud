@@ -3,10 +3,10 @@
 module ApiServices
   extend ActiveSupport::Concern
 
-  def api_services_request_get_Product(url)
+  def api_services_request_get_Product(url, headers={})
     uri = URI(url.to_s)
 
-    res = Net::HTTP.get_response(uri, @headers)
+    res = Net::HTTP.get_response(uri, headers)
     response = res.body if res.is_a?(Net::HTTPSuccess)
     # p response
     return nil unless response
