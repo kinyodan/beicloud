@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
 class BeispacesController < ApplicationController
-  before_action :set_beispace, only: %i[index show edit update destroy]
-  before_action :stage_beispace
+  before_action :authenticate_user! , except: %i[new create]
+  before_action :set_current_beispace, only: %i[index show edit update destroy]
+  before_action :set_beispace,         only: %i[show edit update destroy]
 
   # GET /beispaces or /beispaces.json
   def index
-    # @beispaces = Beispace.all
-    p @beispace
+    @beispaces = current_user_beispaces 
   end
 
   # GET /beispaces/1 or /beispaces/1.json
   def show
-     @beispace
+
   end
 
   # GET /beispaces/new
@@ -25,15 +25,17 @@ class BeispacesController < ApplicationController
 
   # POST /beispaces or /beispaces.json
   def create
-    @beispace = Beispace.new(beispace_params)
+    @beispace = current_user_beispaces.build(beispace_params)
 
     respond_to do |format|
       if @beispace.save
-        format.html { redirect_to beispace_url(@beispace), notice: 'Beispace was successfully created.' }
+        # After creation → set as current Beispace (common pattern)
+        cookies['beispace'] = @beispace.id.to_s
+        format.html { redirect_to @beispace, notice: 'Beispace was successfully created.' }
         format.json { render :show, status: :created, location: @beispace }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @beispace.errors, status: :unprocessable_entity }
+        format.json { render json: @beispace.errors.full_messages, status: :unprocessable_entity }
       end
     end
   end
@@ -42,11 +44,11 @@ class BeispacesController < ApplicationController
   def update
     respond_to do |format|
       if @beispace.update(beispace_params)
-        format.html { redirect_to beispace_url(@beispace), notice: 'Beispace was successfully updated.' }
+        format.html { redirect_to @beispace, notice: 'Beispace was successfully updated.' }
         format.json { render :show, status: :ok, location: @beispace }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @beispace.errors, status: :unprocessable_entity }
+        format.json { render json: @beispace.errors.full_messages, status: :unprocessable_entity }
       end
     end
   end
@@ -63,21 +65,43 @@ class BeispacesController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
+  # Returns Beispaces the current authenticated user has access to
+  # (assuming Beispace belongs_to :user or has_many :users through memberships)
+  def current_user_beispaces
+    if current_beispace_user.present?
+      current_beispace_user.beispaces
+    else
+      Beispace.none
+    end
+  end
+
+  # Sets @current_beispace from cookie — used for context / redirect logic
+  def set_current_beispace
+    beispace_id = cookies['beispace']
+
+    if beispace_id.present?
+      @current_beispace = current_user_beispaces.find_by(id: beispace_id)
+    end
+
+    # Fallback: if no valid current → redirect to index or selection page
+    redirect_to beispaces_path, alert: 'Please select a Beispace.' unless @current_beispace || action_name.in?(%w[index new create])
+  end
+
+  # Loads the specific Beispace for actions that need it — scoped to user's Beispaces
   def set_beispace
-    @beispace = [{ id: cookies['beispace'] }]
-    p @beispace
+    @beispace = current_user_beispaces.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.html { redirect_to beispaces_url, alert: 'Beispace not found or access denied.' }
+      format.json { head :not_found }
+    end
   end
 
-  # Only allow a list of trusted parameters through.
   def beispace_params
-    params.require(:beispace).permit(:user_id, :subdomain, :designation, :app_count)
-  end
-
-  def stage_beispace
-    p 'stage_beispace---stage_beispace'
-    return unless @beispace
-
-    redirect_to beispace_path(@beispace)
+    params.require(:beispace).permit(
+      :subdomain,
+      :designation,
+      :app_count
+    )
   end
 end

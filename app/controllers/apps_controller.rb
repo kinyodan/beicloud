@@ -5,11 +5,13 @@ class AppsController < ApplicationController
 
   # GET /apps or /apps.json
   def index
-    @apps = App.all
+    @pagy, @apps = pagy(current_user_apps, items: 20, page: params[:page])
   end
 
   # GET /apps/1 or /apps/1.json
-  def show; end
+  def show
+    # Authorization check should go here (see notes below)
+  end
 
   # GET /apps/new
   def new
@@ -21,15 +23,15 @@ class AppsController < ApplicationController
 
   # POST /apps or /apps.json
   def create
-    @app = App.new(app_params)
+    @app = current_user_apps.build(app_params)
 
     respond_to do |format|
       if @app.save
-        format.html { redirect_to app_url(@app), notice: 'App was successfully created.' }
+        format.html { redirect_to @app, notice: "App was successfully created." }
         format.json { render :show, status: :created, location: @app }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @app.errors, status: :unprocessable_entity }
+        format.json { render json: @app.errors.full_messages, status: :unprocessable_entity }
       end
     end
   end
@@ -38,11 +40,11 @@ class AppsController < ApplicationController
   def update
     respond_to do |format|
       if @app.update(app_params)
-        format.html { redirect_to app_url(@app), notice: 'App was successfully updated.' }
+        format.html { redirect_to @app, notice: "App was successfully updated." }
         format.json { render :show, status: :ok, location: @app }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @app.errors, status: :unprocessable_entity }
+        format.json { render json: @app.errors.full_messages, status: :unprocessable_entity }
       end
     end
   end
@@ -52,21 +54,41 @@ class AppsController < ApplicationController
     @app.destroy
 
     respond_to do |format|
-      format.html { redirect_to apps_url, notice: 'App was successfully destroyed.' }
+      format.html { redirect_to apps_url, notice: "App was successfully destroyed." }
       format.json { head :no_content }
     end
   end
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_app
-    @app = App.find(params[:id])
+    @app = current_user_apps.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.html { redirect_to apps_url, alert: "App not found." }
+      format.json { head :not_found }
+    end
   end
 
-  # Only allow a list of trusted parameters through.
+  def current_user_apps
+    if current_beispace_user.present?
+      current_beispace_user.apps
+    else
+      App.none
+    end
+  end
+
   def app_params
-    params.require(:app).permit(:user_id, :subdomain, :anchor_url, :back_up_url, :main_url, :github_account,
-                                :github_repo_name, :github_owner, :status, :app_dashboard_id)
+    params.require(:app).permit(
+      :subdomain,
+      :anchor_url,
+      :back_up_url,
+      :main_url,
+      :github_account,
+      :github_repo_name,
+      :github_owner,
+      :status,
+      :app_dashboard_id
+    )
   end
 end

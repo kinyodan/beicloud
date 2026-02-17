@@ -1,34 +1,60 @@
 # frozen_string_literal: true
 
 class GitControlController < ApplicationController
-  skip_before_action :verify_authenticity_token
+  skip_before_action :verify_authenticity_token, only: :clone_repo
 
+  # POST /git_control/clone_repo (or whatever your route is)
   def clone_repo
-    create_deployment(params)
-    deployement = Deployment.where(onboarding_id: params['onboarding_id']).last
+    required_params = %i[repo_url id onboarding_id beiapp_id]
+    missing = required_params - params.keys.map(&:to_sym)
 
-    if deployement
-      onboarding_get_branches_and_Deploy(params[:repo_url], params[:id], params[:onboarding_id],
-                                            params[:beiapp_id])
+    if missing.any?
+      return render json: {
+        status: false,
+        message: "Missing required parameters: #{missing.join(', ')}"
+      }, status: :bad_request
     end
-  rescue StandardError
-    render json: { status: false, messege: 'Problem with deployment at - CLONE REPO stage' }
+
+    # Create deployment record synchronously 
+    deployment = create_deployment_record(params)
+
+    GitDeploymentJob.perform_later(
+      repo_url:     params[:repo_url],
+      onboarding_id: params[:onboarding_id],
+      beiapp_id:    params[:beiapp_id],
+      deployment_id: deployment.id,
+      user_id:      current_beispace_user&.id 
+    )
+
+    render json: {
+      status: true,
+      message: 'Deployment initiated',
+      deployment_id: deployment.id,
+      uuid: deployment.uuid
+    }, status: :accepted 
+  rescue StandardError => e
+    Rails.logger.error("Git clone initiation failed: #{e.message}\n#{e.backtrace.first(5).join("\n")}")
+    render json: { status: false, message: 'Failed to initiate deployment' }, status: :internal_server_error
   end
 
-  def index; end
+  def index
+    @deployments = current_user_deployments.page(params[:page])
+    head :ok
+  end
 
   private
 
-  def create_deployment(params)
-    uuid = SecureRandom.hex(10)
-    Deployment.create(
-      name: 'BeiApp deployemnt',
-      body: "Onboarding-#{params['id']}",
-      onboarding_id: params['onboarding_id'],
-      beiapp_id: params['beiapp_id'],
+  def create_deployment_record(params)
+    uuid = SecureRandom.uuid 
+
+    Deployment.create!(
+      name: "BeiApp Deployment ##{params[:beiapp_id]}",
+      body: "Onboarding ##{params[:id]}",
+      onboarding_id: params[:onboarding_id],
+      beiapp_id: params[:beiapp_id],
       uuid: uuid,
-      status: 'deployment initiated, not completed'
+      status: 'initiated', 
+      initiated_at: Time.current
     )
-    @deployement = Deployment.where(onboarding_id: params['onboarding_id']).last
   end
 end

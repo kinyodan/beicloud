@@ -1,121 +1,128 @@
 # frozen_string_literal: true
-require 'octokit'
-require 'open3'
-require "zlib"
 
 module OnboardingService
   extend ActiveSupport::Concern
 
-  TERMINAL_HEADER = "########\n BeiCloud Deployment ########\n"
+  DEPLOY_APP_PREFIX = "beiapp-".freeze
+  WORK_DIR_BASE     = Rails.root.join("tmp", "deployments").freeze 
 
-  def onboarding_import_from_github(access_token, _owner, _repo, _path_to_file)
-      client = Octokit::Client.new(access_token: access_token)
-      return false unless client && client.repos
-         repos = client.repos.select { |r| r[:id] == 63_977_794 }
-         client.repos
-  end 
+  # Called from GitDeploymentJob.perform_later(...)
+  def self.perform_deployment(onboarding_id:, beiapp_id:, repo_url:, access_token:)
+    new(onboarding_id:, beiapp_id:, repo_url:, access_token:).perform
+  end
 
-  def onboarding_get_branches_and_Deploy(repo, dir_name, onboarding_id, beiapp_id)
-      # start updating the current onboarding with current deployment id
-      beiapp = Beiapp.where(id: beiapp_id).first
-      onboarding = Onboarding.where(id: onboarding_id).first
-      current_deployment = Deployment.where(onboarding_id: onboarding_id).first
-      update_onboarding = onboarding.update_columns(current_deployment_id: current_deployment.id)
-      if update_onboarding
-          p "update_onboarding done--"
-      end 
-      # end updating the current onboarding with current deployment id
+  def initialize(onboarding_id:, beiapp_id:, repo_url:, access_token:)
+    @onboarding    = Onboarding.find(onboarding_id)
+    @beiapp        = Beiapp.find(beiapp_id)
+    @repo_url      = repo_url
+    @access_token  = access_token
+    @channel       = "deployment_#{beiapp_id}_#{onboarding_id}"
+    @logs          = { staging: +"", deployment: +"" }
+  end
 
-      beicloud_icon = "<i class='fa-solid fa-cloud'></i>"
-      Timeout.timeout 5 do
-      end 
-      source_git_processing(dir_name, beicloud_icon, repo)
-      deployment_directory_processing_and_staging(dir_name, beicloud_icon, repo)
-      if system("app003-#{dir_name}")
-         ActionCable.server.broadcast(dir_name, { status: true, body: "#{Time.now}:@beicloud: Setting up app name --> app003-#{dir_name} " })
-      end  
-      setup_deployment_environment(dir_name, beicloud_icon, repo)
+  def perform
+    update_status("initiated")
 
-      
-      create_app_in_deployment_environment(dir_name, beicloud_icon, repo)
-      @compressed_staging_log_data = Zlib::Deflate.deflate(@staging_deployment_logs)
-      update_deployment_status = current_deployment.update_columns(status: "Deployment initiated not completed")
-      if update_deployment_status
-         p "update_deployment_status done"
-      end 
+    dir_name = "#{DEPLOY_APP_PREFIX}#{@beiapp.id}-#{SecureRandom.hex(6)}"
+    full_path = WORK_DIR_BASE.join(dir_name)
 
-      app_deployment(dir_name, beicloud_icon, repo)
-      @compressed_log_data = Zlib::Deflate.deflate(@deployment_logs)
+    FileUtils.mkdir_p(WORK_DIR_BASE)
 
-      logs = { staging: @compressed_staging_log_data, deployment: @compressed_log_data }.to_s
-      update_deployment_Body = current_deployment.update_columns(body: logs, status: "Deployment initiated and succesfully deployed")
-      if update_deployment_Body
-          p "update_deployment_Body done"
-      end 
-      ActionCable.server.broadcast(dir_name, { status: "finished", body: "#{Time.now}:@beicloud: Deploying app successfully completed --> app003-#{dir_name} " })
-  end 
+    broadcast("Starting deployment for #{@beiapp.name} → #{dir_name}")
+
+    begin
+      clone_repository(full_path)
+      prepare_staging(full_path)
+      setup_dokku_app(dir_name)
+      push_to_dokku(full_path, dir_name)
+
+      update_status("deployed")
+      broadcast("Deployment completed successfully", status: "finished")
+    rescue StandardError => e
+      update_status("failed", error_message: e.message)
+      broadcast("Deployment failed: #{e.message}", status: "failed")
+      Rails.logger.error("Deployment failed for BeiApp #{@beiapp.id}: #{e.message}\n#{e.backtrace.join("\n")}")
+      cleanup_on_failure(full_path, dir_name)
+    ensure
+      save_compressed_logs
+    end
+  end
 
   private
 
-  def source_git_processing(dir_name, _beicloud_icon, repo)
-      ActionCable.server.broadcast(dir_name, { status: "finished", body: (TERMINAL_HEADER).to_s })
-      stream_terminal_output("rm -rf ../#{dir_name}", dir_name,{ status: true, body: "#{Time.now}:@beicloud: Starting deployment" })
-      stream_terminal_output("git clone #{repo} ../#{dir_name}", dir_name, { status: true, body: "#{Time.now}:@beicloud: Starting deployment" })
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && pwd", dir_name, { status: true, body: "#{Time.now}:@beicloud: Starting deployment" })
-  end 
+  def broadcast(message, status: true)
+    ActionCable.server.broadcast(@channel, { status:, body: "[#{Time.current}] @beicloud: #{message}" })
+  end
 
-  def deployment_directory_processing_and_staging(dir_name, _beicloud_icon, _repo)
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && dir", dir_name,{ status: true, body: "#{Time.now}:@beicloud: changing directory to staged DIR" })
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && git add . && dir", dir_name, { status: true, body: "#{Time.now}:@beicloud: Adding git commits to staged repo" })
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && git add . && dir", dir_name, { status: true, body: "#{Time.now}:@beicloud: Adding git commits to staged repo" })
-      stream_terminal_output(" cd /home/me/dev/dev3/beicloud/#{dir_name} && git commit -m 'commit for deploy to dokku' && dir ", dir_name, { status: true, body: "#{Time.now}:@beicloud: Commiting for deploy " })
-      stream_terminal_output("git fetch --all", dir_name, { status: true, body: "#{Time.now}:@beicloud: Fetching from repo " })
-      stream_terminal_output("git branch --all ", dir_name, { status: true, body: "#{Time.now}:@beicloud: Staging branch  " })
-  end 
+  def update_status(status, error_message: nil)
+    @onboarding.update_columns(status:)
+    current_deployment&.update_columns(status:, error_message:)
+  end
 
-  def setup_deployment_environment(dir_name, _beicloud_icon, _repo)
-      ActionCable.server.broadcast(dir_name, { status: true, body: "#{Time.now}:@beicloud: Starting Clearing app staging environment --> app003-#{dir_name} " })
-      stream_terminal_output("echo '@Confucius@me2' | sudo -S dokku --force apps:destroy app003-#{dir_name}", dir_name, { status: true, body: "#{Time.now}:@beicloud: Starting Clearing app staging environment --> app003-#{dir_name} " })
-      ActionCable.server.broadcast(dir_name, { status: true, body: "#{Time.now}:@beicloud: #{system('ls')} --> app003-#{dir_name} " })
-      stream_terminal_output("echo '@Confucius@me2' | sudo -S dokku apps:create app003-#{dir_name}", dir_name, { status: true, body: "#{Time.now}:@beicloud: creating app on staged environment --> app003-#{dir_name} " })
-      stream_terminal_output("sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git", dir_name, { status: true, body: "#{Time.now}:@beicloud: Installing posgres on staged environment --> app003-#{dir_name} " })
-  end 
+  def current_deployment
+    @current_deployment ||= Deployment.find_by(onboarding: @onboarding)
+  end
 
-  def create_app_in_deployment_environment(dir_name, _beicloud_icon, _repo)
-      radnm = SecureRandom.hex(10)
-      db_name = "#{SecureRandom.hex(10)}db#{dir_name}"
-      stream_terminal_output("sudo dokku postgres:create #{db_name}", dir_name, { status: true, body: "#{Time.now}:@beicloud: creating app database --> app003-#{dir_name} " })
-      stream_terminal_output("sudo dokku postgres:link #{db_name} app003-#{dir_name}", dir_name, { status: true, body: "#{Time.now}:@beicloud: Attaching database to app --> app003-#{dir_name}" })
-      stream_terminal_output("sudo dokku git:initialize app003-#{dir_name}", dir_name,{ status: true, body: "#{Time.now}:@beicloud: Initializing app git repository app --> app003-#{dir_name}" })
-      ActionCable.server.broadcast(dir_name, { status: true, body: "#{Time.now}:@beicloud: #{system('ls')} --> app003-#{dir_name} " })
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && git remote remove dokku", dir_name,{ status: true, body: "#{Time.now}:@beicloud: setting up remote origin --> app003-#{dir_name} " })
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && git remote add dokku dokku@beicloud.com:app003-#{dir_name}", dir_name, { status: true, body: "#{Time.now}:@beicloud: adding remote origin to app staging environment --> app003-#{dir_name} " })
-  end     
+  def clone_repository(path)
+    broadcast("Cloning repository...")
+    run_command("git clone #{@repo_url} #{path}", chdir: WORK_DIR_BASE)
+  end
 
-  def app_deployment(dir_name, _beicloud_icon, _repo)
-      ActionCable.server.broadcast(dir_name, { status: true, body: "#{Time.now}:@beicloud: Starting deployment to staged environment --> app003-#{dir_name} " })
-      stream_terminal_output("cd /home/me/dev/dev3/beicloud/#{dir_name} && git push dokku master", dir_name, { status: true, body: "#{Time.now}:@beicloud: Deploying app --> app003-#{dir_name} " }, "deploy")
-  end 
+  def prepare_staging(path)
+    broadcast("Preparing staging directory...")
+    Dir.chdir(path) do
+      run_command("git add .")
+      run_command("git commit -m 'Deployment commit [skip ci]' --allow-empty || true")
+    end
+  end
 
-  def stream_terminal_output(cmd, dir_name, initial_messege, process = "staging")
-      exceptions_text = { "Unlinking": true, "retire": true }
-      ActionCable.server.broadcast(dir_name, initial_messege)
-      Open3.popen3(cmd) do |_stdin, stdout, _stderr, _wait_thr|
-          while (line = stdout.gets)
-              if line.include? "dokku"
-                 line["dokku"] = "beicloud"
-              end 
-                             line.include? "retire"
-                if process == "staging"
-                   @staging_deployment_logs = @staging_deployment_logs + "<!~!>" + line 
-                end
+  def setup_dokku_app(app_name)
+    broadcast("Setting up Dokku app: #{app_name}")
 
-                if process == "deploy"
-                   @deployment_logs = @deployment_logs + "<!~!>" + line
-                end 
-                ActionCable.server.broadcast(dir_name, { status: true, body: "#{Time.now}:@beicloud: #{line} --> app003-#{dir_name} " })
-              end
-          end
+    run_command("dokku apps:destroy #{app_name} --force || true")
+    run_command("dokku apps:create #{app_name}")
+
+    # Database example (make configurable per stack)
+    db_name = "db-#{app_name}"
+    run_command("dokku postgres:create #{db_name}")
+    run_command("dokku postgres:link #{db_name} #{app_name}")
+  end
+
+  def push_to_dokku(path, app_name)
+    broadcast("Pushing to Dokku remote...")
+    Dir.chdir(path) do
+      run_command("git remote remove dokku || true")
+      run_command("git remote add dokku dokku@#{dokku_host}:#{app_name}")
+      run_command("git push dokku master:main --force")
+    end
+  end
+
+  def run_command(cmd, chdir: nil, &block)
+    Dir.chdir(chdir || WORK_DIR_BASE) do
+      stdout_str, stderr_str, status = Open3.capture3(cmd)
+
+      output = stdout_str + stderr_str
+      output.each_line do |line|
+        cleaned = line.gsub(/dokku/i, "beicloud").strip
+        broadcast(cleaned)
+        yield cleaned if block_given?
       end
-  end 
+
+      raise "Command failed: #{cmd}\n#{stderr_str}" unless status.success?
+    end
+  end
+
+  def cleanup_on_failure(path, app_name)
+    FileUtils.rm_rf(path) rescue nil
+    run_command("dokku apps:destroy #{app_name} --force || true") rescue nil
+  end
+
+  def save_compressed_logs
+    compressed = Zlib::Deflate.deflate(@logs.values.join("\n"))
+    current_deployment&.update_columns(body: compressed)
+  end
+
+  def dokku_host
+    ENV.fetch("DOKKU_HOST", "beicloud.com")
+  end
 end
